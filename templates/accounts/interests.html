@@ -1,0 +1,131 @@
+    {% extends "shared/_layout.html" %}
+    {% block title %}Interests{% endblock %}
+    {% block main_content %}
+    <div class="sidebar">
+        <div class="user-profile">
+        {% for info in user_profile %}
+          <div class="display-avatar animated-avatar">
+            <img class="profile-img img-lg rounded-circle" src="/static/assets/images/profile/female/image_5.png" alt="profile image">
+          </div>
+          <div class="info-wrapper">
+            <p class="user-name">{{info.name}}</p>
+            <h6 class="user-title">{{info.title}}</h6>
+          </div>
+        {% endfor %}
+        </div>
+        <ul class="navigation-menu">
+          <li>
+            <a href="/accounts/index">
+              <span class="link-title">Dashboard</span>
+              <i class="mdi mdi-gauge link-icon"></i>
+            </a>
+          </li>
+          <li>
+            <a href="/accounts/equipments">
+              <span class="link-title">Equipment</span>
+              <i class="mdi mdi-rocket link-icon"></i>
+            </a>
+          </li>
+            <li>
+              <a href="#projects" data-toggle="collapse" aria-expanded="false">
+                <span class="link-title">Projects</span>
+                <i class="mdi mdi-presentation link-icon"></i>
+              </a>
+              <ul class="collapse navigation-submenu" id="projects">
+                <li>
+                  <a href="/accounts/joinedProjects">Joined Projects</a>
+                </li>
+                <li>
+                  <a href="/accounts/createProject">Create Projects</a>
+                </li>
+                <li>
+                  <a href="/accounts/manageprojects">Manage Projects</a>
+                </li>
+              </ul>
+            </li>   
+          <li>
+            <a href="#profile" data-toggle="collapse" aria-expanded="false">
+              <span class="link-title">Profile</span>
+              <i class="mdi mdi-account-circle link-icon"></i>
+            </a>
+            <ul class="collapse navigation-submenu" id="profile">
+              <li>
+                <a href="/accounts/profile">Profile</a>
+              </li>
+              <li>
+                <a href="/accounts/interests">Manage Interests</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="/accounts/friends">
+             <span class="link-title">View Friends</span>
+             <i class="mdi mdi-account-multiple link-icon"></i>
+           </a>
+         </li>
+        </ul>
+      </div>
+    <div class="page-content-wrapper">
+    <div class="page-content-wrapper-inner">
+        <div class="main">
+        <div class="col-lg-12 equel-grid">
+            <div class="grid">
+            <p class="grid-header">Manage Interests</p>
+            <div class="grid-body">
+                <div class="item-wrapper">
+                <div class="form-group row showcase_row_area mb-1">
+                    <div class="col-md-2 showcase_text_area">
+                    <label for="titleInput">Search Target </label>
+                    </div>
+                    <div class="col-md-8 showcase_content_area">
+                    <form method="POST">
+                    <input class="form-control" type="text" name="Search" id="targetSearchInput" placeholder="Input Target Name to Search">
+                    </form>
+                    </div>
+                    <button name="button" type="button" id="submitsearchTargetbtn"  class="btn btn-sm btn-primary" value="Search"><i class="mdi mdi-magnify mr-1"></i>Search</button>
+                </div> 
+                <div class="form-group row showcase_row_area">
+                    <div class="col-md-2 showcase_text_area">
+                    <label for="titleInput">Select Target</label>
+                    </div>
+                    <div class="col-md-8 showcase_content_area">
+                    <form>
+                        <input list="targetDataList" id="inputTargetDataList" class="form-control" type="text" name="name" >
+                        <datalist id = "targetDataList"> 
+                        </datalist>
+                    </form>
+                    </div>
+                    <button name="selectTargetbtn" type="button" id="selectTargetbtnInterest" class="btn btn-sm btn-primary pr-4" value="Search"><i class="mdi mdi-arrow-right-bold-circle mr-1"></i> Select</button>    
+                </div> 
+                <div class="form-group row showcase_row_area" id="targetInterestDiv">
+                    {% for interest in interests%}
+                    <div class="col-11 targetProjectAddList">
+                        <fieldset disabled class="mb-3">
+                          <div class="form-group row showcase_row_area">
+                            <div class="col-md-3 showcase_text_area">
+                              <label for="showSelectTargetName">Target Name</label>
+                            </div>
+                            <div class="col-md-9 showcase_content_area">
+                              <input id="showSelectTargetName"  type="text" class="form-control"  placeholder="Target Name" value="{{interest.name}}">
+                            </div>                         
+                        </div>
+                        <div>
+                          <input type="hidden" id="hiddenSelectTargetID" type="number"  name="TID" value="{{interest.TID}}">
+                        </div>
+                        </fieldset>
+                    </div>
+                      <div class="col-1">
+                        <div>
+                          <button class="btn btn-sm btn-danger mb-5 deleteTargetInterest" type="button"> <i class="mdi mdi-minus-circle "></i></button>
+                        </div>
+                      </div><hr mb-3>
+                      {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+                </div>
+                </div>
+
+  {% endblock %}

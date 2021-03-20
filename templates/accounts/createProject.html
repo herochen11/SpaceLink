@@ -1,0 +1,364 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Create Project{% endblock %}
+{% block main_content %}
+
+<div class="sidebar">
+  <div class="user-profile">
+  {% for info in user_profile %}
+    <div class="display-avatar animated-avatar">
+      <img class="profile-img img-lg rounded-circle" src="/static/assets/images/profile/female/image_5.png" alt="profile image">
+    </div>
+    <div class="info-wrapper">
+      <p class="user-name">{{info.name}}</p>
+      <h6 class="user-title">{{info.title}}</h6>
+    </div>
+  {% endfor %}
+  </div>
+  <ul class="navigation-menu">
+    <li>
+      <a href="/accounts/index">
+        <span class="link-title">Dashboard</span>
+        <i class="mdi mdi-gauge link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/accounts/equipments">
+        <span class="link-title">Equipment</span>
+        <i class="mdi mdi-rocket link-icon"></i>
+      </a>
+    </li>
+      <li>
+        <a href="#projects" data-toggle="collapse" aria-expanded="false">
+          <span class="link-title">Projects</span>
+          <i class="mdi mdi-presentation link-icon"></i>
+        </a>
+        <ul class="collapse navigation-submenu" id="projects">
+          <li>
+            <a href="/accounts/joinedProjects">Joined Projects</a>
+          </li>
+          <li>
+            <a href="/accounts/createProject">Create Projects</a>
+          </li>
+          <li>
+            <a href="/accounts/manageprojects">Manage Projects</a>
+          </li>
+        </ul>
+      </li>   
+    <li>
+      <a href="#profile" data-toggle="collapse" aria-expanded="false">
+        <span class="link-title">Profile</span>
+        <i class="mdi mdi-account-circle link-icon"></i>
+      </a>
+      <ul class="collapse navigation-submenu" id="profile">
+        <li>
+          <a href="/accounts/profile">Profile</a>
+        </li>
+        <li>
+          <a href="/accounts/interests">Manage Interests</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="/accounts/friends">
+       <span class="link-title">View Friends</span>
+       <i class="mdi mdi-account-multiple link-icon"></i>
+     </a>
+   </li>
+  </ul>
+</div>
+      <div class="page-content-wrapper">
+        <div class="page-content-wrapper-inner">
+          <div class="content-viewport">
+                <div class="row">
+                  <div class="col-10">
+                <div class="grid" id="addProjectForm">
+                  <p class="grid-header">Add Project</p>
+                  <div class="grid-body">
+                    <div class="item-wrapper">
+                <form method="POST" id="createProjectForm">
+                  
+                  <div class="form-group row showcase_row_area">
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="project_type">Project Type</label>
+                    </div>
+                    <div class="col-md-5 showcase_content_area">
+                      <select class="form-control" id="project_type" name="project_type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="transient">Transient</option>
+                        <option value="regular">Regular</option>
+                        <option value="target_of_opportunity">Target of Opportunity</option>
+                      </select>
+                    </div> 
+                  </div> 
+                  
+                  <div class="form-group row showcase_row_area">
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="titleInput">Project Name</label>
+                    </div>
+                    <div class="col-md-9 showcase_content_area">
+                      <input id="title" type="text" class="form-control" name="title" placeholder="Title" value="{{ title }}" required>
+                    </div> 
+                  </div>
+
+                  <div class="form-group row showcase_row_area">
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="descriptionInput">Project Description</label>
+                    </div>
+                    <div class="col-md-9 showcase_content_area">
+                      <input id="description" type="text" class="form-control" name="description" placeholder="Description" value="{{ description }}" required>
+                    </div>
+                  </div>
+
+                  <p class="text-left">Equipment Requirement</p>                  
+                  <div class="form-group row showcase_row_area"><span class="col-12" style="border-bottom: 1px solid grey;"></span></div>
+
+
+                  <div class="form-group row showcase_row_area ">
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="aperture_upper_limitInput">Aperture Upper Limit</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                      <input id="aperture_upper_limit" step="1.00" type="number" class="form-control" name="aperture_upper_limit" placeholder="1" value="{{ aperture_upper_limit }}" required>
+                    </div> 
+                    <div class="col-md-3  showcase_text_area">
+                      <label for="aperture_lower_limitInput">Aperture Lower Limit</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                      <input step="1.00" type="number" id="aperture_lower_limit" class="form-control" name="aperture_lower_limit" placeholder="1" value="{{ aperture_lower_limit }}" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group row showcase_row_area ">
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="FoV_upper_limitInput">FoV Upper Limit</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                      <input id="FoV_upper_limitInput" step="1.00" type="number" class="form-control" name="FoV_upper_limit" placeholder="1" value="{{ FoV_upper_limit }}" required>
+                    </div> 
+                    <div class="col-md-3  showcase_text_area">
+                      <label for="aperture_lower_limitInput">FoV Lower Limit</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                      <input id="FoV_lower_limitInput" step="1.00" type="number" class="form-control" name="FoV_lower_limit" placeholder="1" value="{{ FoV_lower_limit }}" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group row showcase_row_area ">
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="pixel_scale_upperInput">Pixel Scale Upper Limit</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                      <input id="pixel_scale_upperInput" step="1" type="number" class="form-control" name="pixel_scale_upper_limit" placeholder="1" value="{{ pixel_scale_upper_limit }}" required>
+                    </div> 
+                    <div class="col-md-3  showcase_text_area">
+                      <label for="pixel_scale_lowerInput">Pixel Scale Lower Limit</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                      <input id="pixel_scale_lowerInput" step="1" type="number" class="form-control" name="pixel_scale_lower_limit" placeholder="1" value="{{ pixel_scale_lower_limit }}" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group row showcase_row_area "> 
+                    <div class="col-md-3 showcase_text_area">
+                      <label for="mountSelect">Mount Type</label>
+                    </div>
+                    <div class="col-md-3 showcase_content_area">
+                        <select class="form-control" id="mountSelect" name="mount_type" required>
+                          <option value="" disabled selected>Select Type</option>
+                          <option value="german">German</option>
+                          <option value="fork">Fork</option>
+                          <option value="theodolite">Theodolite</option>
+                        </select>
+                    </div>           
+                  </div>
+                  
+
+                  
+                  <div class="form-group row showcase_row_area">
+                    <div class="col-md-3 showcase_text_area ">
+                      <label for="cameraInput">Camera Type</label>
+                    </div>
+                    <div class="col-md-3 showcase_content_area showcase_text_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="camera_type1" id="colored" value="Colored">
+                      <label class="form-check-label" for="cameraColored">Colored</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="camera_type1" id="mono" value="Mono">
+                      <label class="form-check-label" for="cameraMono">Mono</label>
+                    </div>
+                    </div>
+                    <div class="col-md-3 showcase_content_area showcase_text_area">
+                      <div class="form-check form-check-inline mb-1">
+                        <input class="form-check-input" type="radio" name="camera_type2" id="cooled" value="Cooled">
+                        <label class="form-check-label" for="cameraCooled">Cooled</label>
+                      </div>
+                      <div class="form-check form-check-inline mb-1">
+                        <input class="form-check-input" type="radio" name="camera_type2" id="uncooled" value="Uncooled">
+                        <label class="form-check-label" for="cameraUncooled">Uncooled</label>
+                      </div>
+                    </div>       
+                  </div>
+
+
+                  <div class="form-group row showcase_row_area">
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="johnsonBInput">Johnson B</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="JohnsonB" id="johnsonBYes" value="y">
+                      <label class="form-check-label" for="johnsonBYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="JohnsonB" id="johnsonBNo" value="n">
+                      <label class="form-check-label" for="johnsonBNo">No</label>
+                    </div>
+                    </div>
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="johnsonVInput">Johnson V</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="JohnsonV" id="johnsonVYes" value="y">
+                      <label class="form-check-label" for="johnsonVYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="JohnsonV" id="johnsonVNo" value="n">
+                      <label class="form-check-label" for="johnsonVNo">No</label>
+                    </div>
+                    </div> 
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="johnsonRInput">Johnson R</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="JohnsonR" id="johnsonRYes" value="y">
+                      <label class="form-check-label" for="johnsonRYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="JohnsonR" id="johnsonRNo" value="n">
+                      <label class="form-check-label" for="johnsonRNo">No</label>
+                    </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group row showcase_row_area">  
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="sdssuInput">SDSS u</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSu" id="sdssuYes" value="y">
+                      <label class="form-check-label" for="sdssuYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSu" id="sdssuNo" value="n">
+                      <label class="form-check-label" for="sdssuNo">No</label>
+                    </div>
+                    </div>          
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="sdssgInput">SDSS g</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSg" id="sdssgYes" value="y">
+                      <label class="form-check-label" for="sdssgYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSg" id="sdssgNo" value="n">
+                      <label class="form-check-label" for="sdssgNo">No</label>
+                    </div>
+                    </div>
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="sdssrInput">SDSS r</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSr" id="sdssrYes" value="y">
+                      <label class="form-check-label" for="sdssrYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSr" id="sdssrNo" value="n">
+                      <label class="form-check-label" for="sdssrNo">No</label>
+                    </div>
+                    </div>                  
+                  </div>
+
+                  <div class="form-group row showcase_row_area ">
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="sdssiInput">SDSS i</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area ">
+                    <div class="form-check form-check-inline mb-1 ">
+                      <input class="form-check-input" type="radio" name="SDSSi" id="sdssiYes" value="y">
+                      <label class="form-check-label" for="sdssiYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSi" id="sdssiNo" value="n">
+                      <label class="form-check-label" for="sdssiNo">No</label>
+                    </div>
+                    </div>
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="sdsszInput">SDSS z</label>
+                    </div>
+                    <div class="col-md-2 showcase_content_area">
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSz" id="sdsszYes" value="y">
+                      <label class="form-check-label" for="sdsszYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-1">
+                      <input class="form-check-input" type="radio" name="SDSSz" id="sdsszNo" value="n">
+                      <label class="form-check-label" for="sdsszNo">No</label>
+                    </div>
+                    </div>                  
+                  </div>
+
+                  <p class="text-left">Target</p>                  
+                  <div class="form-group row showcase_row_area"><span class="col-12" style="border-bottom: 1px solid grey;"></span></div>
+
+                  <div class="form-group row showcase_row_area mb-1">
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="titleInput">Search Target </label>
+                    </div>
+                    <div class="col-md-8 showcase_content_area">
+                    <form method="POST">
+                      <input class="form-control" type="text" name="Search" id="targetSearchInput" placeholder="Input Target Name to Search">
+                    </form>
+                    </div>
+                    <button name="button" type="button" id="submitsearchTargetbtn"  class="btn btn-sm btn-primary" value="Search"><i class="mdi mdi-magnify mr-1"></i>Search</button>
+                  </div> 
+
+
+                  <div class="form-group row showcase_row_area">
+                    <div class="col-md-2 showcase_text_area">
+                      <label for="titleInput">Select Target</label>
+                    </div>
+                    <div class="col-md-8 showcase_content_area">
+                      <form>
+                        <input list="targetDataList" id="inputTargetDataList" class="form-control" type="text" name="name" >
+                           <datalist id = "targetDataList"> 
+                           </datalist>
+                      </form>
+                    </div>
+                    <button name="selectTargetbtn" type="button" id="selectTargetbtn" class="btn btn-sm btn-primary pr-4" value="Search"><i class="mdi mdi-arrow-right-bold-circle mr-1"></i> Select</button>    
+                  </div> 
+                  <div class="form-group row showcase_row_area" id="targetDiv">
+                </div>
+                  <div class="row">
+                    <div class="col-md-2"></div>
+                            <button class="btn btn-sm btn-danger mt-3" type="button"><i class="mdi mdi-close-circle mr-2"></i>Cancel</button>
+                            <span class="mr-3"></span>                      
+                    <button type="submit" id="submitCreateProjectbtn" display="none" class="btn btn-sm btn-primary mt-3" name="button" value="Create">Save</button>
+                    </div>        
+                </form>
+                  </div>
+                  </div>
+                
+                </div>
+                </div>
+                </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Equipments{% endblock %}
+{% block main_content %}
+
+<div class="main">
+    <div class="form-wrapper">
+        <form method="post">
+            <h2>Add new equipments</h2>
+                <input class="form-control" type="hidden" name='uhaveid' >
+                <input class="form-control" type="text" name="site" placeholder=" Site" >
+                <input class="form-control" type="text" name="longitude" placeholder=" Longitude" >
+                <input class="form-control" type="text" name="latitude" placeholder=" Latitude" >
+                <input class="form-control" type="text" name="altitude" placeholder=" Altitude" >
+                <input class="form-control" type="text" name="time_zone" placeholder=" Time zone" >
+                <input class="form-control" type="text" name="daylight_saving" placeholder=" Daylight saving" >
+                <input class="form-control" type="text" name="water_vapor" placeholder=" Water vapor" >
+                <input class="form-control" type="text" name="light_pollution" placeholder=" Light pollution(m/sas)" >
+                <h4>Equipment detail</h4>
+                <input class="form-control" type="text" name="aperture" placeholder=" Aperture" >
+                <input class="form-control" type="text" name="fov" placeholder=" FoV" >
+                <input class="form-control" type="text" name="pixel" placeholder=" Pixel scale" >
+                <input class="form-control" type="text" name="accuracy" placeholder="  Tracking accuracy" >
+                <input class="form-control" type="text" name="mag" placeholder="  Limiting magnitude" >
+                <input class="form-control" type="text" name="deg" placeholder="  elevation limit" >
+                <input class="form-control" type="text" name="mount_type" placeholder=" mount type (german, fork, theodolite)" >
+                <input class="form-control" type="text" name="camera_type1" placeholder=" camera type (colored, mono)" >
+                <input class="form-control" type="text" name="camera_type2" placeholder=" camera type (cooled, uncooled)" >
+                <input class="form-control" type="text" name="JohnsonB" placeholder=" Johnson B" >
+                <input class="form-control" type="text" name="JohnsonV" placeholder=" Johnson V" >
+                <input class="form-control" type="text" name="JohnsonR" placeholder=" Johnson R" >
+                <input class="form-control" type="text" name="SDSSu" placeholder="  SDSS u" >
+                <input class="form-control" type="text" name="SDSSg" placeholder="  SDSS g" >
+                <input class="form-control" type="text" name="SDSSr" placeholder="  SDSS r" >
+                <input class="form-control" type="text" name="SDSSi" placeholder="  SDSS i" >
+                <input class="form-control" type="text" name="SDSSz" placeholder="  SDSS z" >
+            <div class="actions">
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="add">Add New Equipments</button>
+            </div>
+        
+        <div class="error-msg">
+            {% if error %}
+                <div class="error-msg">{{ error }}</div>
+            {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                            {% for msg in messages %}
+                                <p>{{ msg }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+        </form>
+            <h2 style="color:black">Equipments list</h2>
+            {% if user_equipments %}
+             {% for info in user_equipments %}
+             <form method="post">
+            <h2 style="color:black">equipments {{loop.index}}</h2>
+                <input class="form-control" type="hidden" name='uhaveid' value="{{info.id}}" >
+                <input class="form-control" type="text" name="site" placeholder=" Site" value="{{ info.site }}">
+                <input class="form-control" type="text" name="longitude" placeholder=" Longitude" value="{{ info.longitude }}">
+                <input class="form-control" type="text" name="latitude" placeholder=" Latitude" value="{{ info.latitude }}">
+                <input class="form-control" type="text" name="altitude" placeholder=" Altitude" value="{{ info.altitude }}" >
+                <input class="form-control" type="text" name="time_zone" placeholder=" Time zone" value="{{ info.time_zone }}" >
+                <input class="form-control" type="text" name="daylight_saving" placeholder=" Daylight saving" value="{{ info.daylight_saving }}" >
+                <input class="form-control" type="text" name="water_vapor" placeholder=" Water vapor" value="{{ info.water_vapor }}" >
+                <input class="form-control" type="text" name="light_pollution" placeholder=" Light pollution(m/sas)" value="{{ info.light_pollution }}" >
+                <h4 style="color:black">Equipment detail</h4>
+                <input class="form-control" type="text" name="aperture" placeholder=" Aperture" value="{{info.aperture}}" >
+                <input class="form-control" type="text" name="fov" placeholder=" FoV" value="{{info.Fov}}">
+                <input class="form-control" type="text" name="pixel" placeholder=" Pixel scale" value="{{info.pixel_scale}}">
+                <input class="form-control" type="text" name="accuracy" placeholder="  Tracking accuracy" value="{{info.accuracy}}">
+                <input class="form-control" type="text" name="mag" placeholder="  Limiting magnitude" value="{{info.lim_magnitude}}">
+                <input class="form-control" type="text" name="deg" placeholder="  elevation limit" value="{{info.elevation_lim}}">
+                <input class="form-control" type="text" name="mount_type" placeholder=" mount type (german, fork, theodolite)" value="{{info.mount_type}}">
+                <input class="form-control" type="text" name="camera_type1" placeholder=" camera type (colored, mono)" value="{{info.camera_type1}}">
+                <input class="form-control" type="text" name="camera_type2" placeholder=" camera type (cooled, uncooled)" value="{{info.camera_type2}}">
+                <input class="form-control" type="text" name="JohnsonB" placeholder=" Johnson B" value="{{info.JohnsonB}}">
+                <input class="form-control" type="text" name="JohnsonV" placeholder=" Johnson V" value="{{info.JohnsonR}}">
+                <input class="form-control" type="text" name="JohnsonR" placeholder=" Johnson R" value="{{info.JohnsonV}}">
+                <input class="form-control" type="text" name="SDSSu" placeholder="  SDSS u" value="{{info.SDSSu}}">
+                <input class="form-control" type="text" name="SDSSg" placeholder="  SDSS g" value="{{info.SDSSg}}">
+                <input class="form-control" type="text" name="SDSSr" placeholder="  SDSS r" value="{{info.SDSSr}}">
+                <input class="form-control" type="text" name="SDSSi" placeholder="  SDSS i" value="{{info.SDSSi}}">
+                <input class="form-control" type="text" name="SDSSz" placeholder="  SDSS z" value="{{info.SDSSz}}">
+            <div class="actions">
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="update">Update</button>
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="delete">Delete</button>
+            </div>
+             </form>    
+            {% endfor%}
+            {% endif%}
+        </form>    
+    </div>
+</div>
+{% endblock %}

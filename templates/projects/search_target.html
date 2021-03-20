@@ -1,0 +1,23 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Search{% endblock %}
+{% block main_content %}
+
+<div class="main">
+    <div class="form-wrapper">
+        <h2>Target</h2>
+            <form method="POST">
+                <input class="form-control" type="text" name="Search" placeholder="Target name">
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="Search">Search</button>
+            </form>
+        <h2>Target Result</h2>
+        <form method="POST">
+             <input list="name" class="form-control" type="text" name="name" >
+                <datalist id = "name">
+                {%for info in target%}    
+                    <option value = "{{info.name}}"></option>
+                {% endfor%}
+                </datalist>
+        </form>
+    </div>
+</div>
+{% endblock %}

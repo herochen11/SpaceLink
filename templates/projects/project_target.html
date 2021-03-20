@@ -1,0 +1,16 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Project Targets{% endblock %}
+{% block main_content %}
+
+<div class="main">
+    <div class="form-wrapper">
+        <form method="post">
+            <h2>Project Targets</h2>
+                {%for info in project_target%}    
+                <h4>target {{loop.index}}</h4>
+                <input class="form-control" type="text" name="target" value="{{info.target}}" >
+                {% endfor%}
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Project Create{% endblock %}
+{% block main_content %}
+
+<div class="main">
+    <div class="form-wrapper">
+        <form method="POST">
+            <h2>Project</h2>
+                <input class="form-control" type="hidden" name="PID" >
+                <input class="form-control" type="hidden" name="PI" >
+                <input class="form-control" type="hidden" name="umanageid" >
+                <input class="form-control" type="text" name="title" placeholder=" Title"> 
+                <input class="form-control" type="text" name="project_type" placeholder=" Project Type"> 
+                <input class="form-control" type="text" name="description" placeholder=" description"> 
+                <input class="form-control" type="text" name="aperture_upper_limit" placeholder=" aperture_upper_limit"> 
+                <input class="form-control" type="text" name="aperture_lower_limit" placeholder=" aperture_lower_limit"> 
+                <input class="form-control" type="text" name="FoV_upper_limit" placeholder=" FoV_upper_limit"> 
+                <input class="form-control" type="text" name="FoV_lower_limit" placeholder=" FoV_lower_limit"> 
+                <input class="form-control" type="text" name="pixel_scale_upper_limit" placeholder=" pixel_scale_upper_limit"> 
+                <input class="form-control" type="text" name="pixel_scale_lower_limit" placeholder=" pixel_scale_lower_limit"> 
+                <input class="form-control" type="text" name="mount_type" placeholder=" mount_type"> 
+                <input class="form-control" type="text" name="camera_type1" placeholder=" camera_type1"> 
+                <input class="form-control" type="text" name="camera_type2"  placeholder=" camera_type2"> 
+                <input class="form-control" type="text" name="JohnsonB"  placeholder=" JohnsonB"> 
+                <input class="form-control" type="text" name="JohnsonV"  placeholder=" JohnsonV"> 
+                <input class="form-control" type="text" name="JohnsonR"  placeholder=" JohnsonR"> 
+                <input class="form-control" type="text" name="SDSSu"  placeholder=" SDSSu"> 
+                <input class="form-control" type="text" name="SDSSg"  placeholder=" SDSSg"> 
+                <input class="form-control" type="text" name="SDSSr"  placeholder=" SDSSr"> 
+                <input class="form-control" type="text" name="SDSSi"  placeholder=" SDSSi"> 
+                <input class="form-control" type="text" name="SDSSz"  placeholder=" SDSSz"> 
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="Create">Create</button>
+        </form>
+                {%for info in projects%}    
+                <h4>project {{loop.index}}</h4>
+                <form method="POST">
+                <input class="form-control" type="hidden" name="PID" value="{{info.PID}}">
+                <input class="form-control" type="hidden" name="PI" value="{{info.PI}}">
+                <input class="form-control" type="hidden" name="umanageid" value="{{info.umanageid}}">
+                <input class="form-control" type="text" name="title" value="{{info.title}}" >
+                <input class="form-control" type="text" name="project_type" value="{{info.project_type}}" >
+                <input class="form-control" type="text" name="description" value="{{info.description}}" >
+                <input class="form-control" type="text" name="aperture_upper_limit" value="{{info.aperture_upper_limit}}" >
+                <input class="form-control" type="text" name="aperture_lower_limit" value="{{info.aperture_lower_limit}}" >
+                <input class="form-control" type="text" name="FoV_upper_limit" value="{{info.FoV_upper_limit}}" >
+                <input class="form-control" type="text" name="FoV_lower_limit" value="{{info.FoV_lower_limit}}" >
+                <input class="form-control" type="text" name="pixel_scale_upper_limit" value="{{info.pixel_scale_lower_limit}}" >
+                <input class="form-control" type="text" name="pixel_scale_lower_limit" value="{{info.pixel_scale_lower_limit}}" >
+                <input class="form-control" type="text" name="mount_type" value="{{info.mount_type}}">
+                <input class="form-control" type="text" name="camera_type1" value="{{info.camera_type1}}">
+                <input class="form-control" type="text" name="camera_type2"  value="{{info.camera_type2}}">
+                <input class="form-control" type="text" name="JohnsonB"  value="{{info.JohnsonB}}">
+                <input class="form-control" type="text" name="JohnsonV"  value="{{info.JohnsonR}}">
+                <input class="form-control" type="text" name="JohnsonR"  value="{{info.JohnsonV}}">
+                <input class="form-control" type="text" name="SDSSu"  value="{{info.SDSSu}}">
+                <input class="form-control" type="text" name="SDSSg"  value="{{info.SDSSg}}">
+                <input class="form-control" type="text" name="SDSSr"  value="{{info.SDSSr}}">
+                <input class="form-control" type="text" name="SDSSi"  value="{{info.SDSSi}}">
+                <input class="form-control" type="text" name="SDSSz"  value="{{info.SDSSz}}">
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="Update">Update</button>
+                <button name="button" type="submit" class="bt btn-info btn-sm" value="Delete">Delete</button>
+                </form>
+                {% endfor%}   
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,667 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Equipments{% endblock %}
+{% block main_content %}
+<div class="sidebar">
+  <div class="user-profile">
+  {% for info in user_profile %}
+    <div class="display-avatar animated-avatar">
+      <img class="profile-img img-lg rounded-circle" src="/static/assets/images/profile/female/image_5.png" alt="profile image">
+    </div>
+    <div class="info-wrapper">
+      <p class="user-name">{{info.name}}</p>
+      <h6 class="user-title">{{info.title}}</h6>
+    </div>
+  {% endfor %}
+  </div>
+  <ul class="navigation-menu">
+    <li>
+      <a href="/accounts/index">
+        <span class="link-title">Dashboard</span>
+        <i class="mdi mdi-gauge link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/accounts/equipments">
+        <span class="link-title">Equipment</span>
+        <i class="mdi mdi-rocket link-icon"></i>
+      </a>
+    </li>
+      <li>
+        <a href="#projects" data-toggle="collapse" aria-expanded="false">
+          <span class="link-title">Projects</span>
+          <i class="mdi mdi-presentation link-icon"></i>
+        </a>
+        <ul class="collapse navigation-submenu" id="projects">
+          <li>
+            <a href="/accounts/joinedProjects">Joined Projects</a>
+          </li>
+          <li>
+            <a href="/accounts/createProject">Create Projects</a>
+          </li>
+          <li>
+            <a href="/accounts/manageprojects">Manage Projects</a>
+          </li>
+        </ul>
+      </li>   
+    <li>
+      <a href="#profile" data-toggle="collapse" aria-expanded="false">
+        <span class="link-title">Profile</span>
+        <i class="mdi mdi-account-circle link-icon"></i>
+      </a>
+      <ul class="collapse navigation-submenu" id="profile">
+        <li>
+          <a href="/accounts/profile">Profile</a>
+        </li>
+        <li>
+          <a href="/accounts/interests">Manage Interests</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="/accounts/friends">
+       <span class="link-title">View Friends</span>
+       <i class="mdi mdi-account-multiple link-icon"></i>
+     </a>
+   </li>
+  </ul>
+</div>
+<div class="page-content-wrapper">
+  <div class="page-content-wrapper-inner">
+    <div class="content-viewport">
+          <div class="row">
+                <button class="btn btn-sm btn-success mb-5" id="addEquipmentBtn"><i class="mdi mdi-plus-circle mr-2"></i>Add Equipment</button>
+             
+          </div>
+          <div class="row">
+          <div class="grid" id="addEquipmentForm" style="display: none;">
+            <p class="grid-header">Add Equipment</p>
+            <div class="grid-body">
+              <div class="item-wrapper">
+          <form method="POST">
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="siteInput">Site</label>
+              </div>
+              <div class="col-md-10 showcase_content_area">
+                <input id="siteInput" type="text" class="form-control" name="site" placeholder="Site" value="{{ site }}" required>
+              </div> 
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2"></div>
+              <button type="button" class="btn btn-xs btn-info" id="Showmap">Get Equipment Coordinates</button>
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="longitudeInput">Longitude</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="longitudeInput" type="text" class="form-control" name="longitude" placeholder="0.0" value="{{ longitude }}" required>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="latitudeInput">Latitude</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="latitudeInput" type="text" class="form-control" name="latitude" placeholder="0.0" value="{{ latitude }}" required>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="altitudeInput">Altitude</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="altitudeInput" type="text" class="form-control" name="altitude" placeholder="0.0" value="{{ altitude }}" required>
+              </div>
+            </div>            
+            <div class="form-group row showcase_row_area">              
+              <div class="col-md-2 showcase_text_area">
+                <label for="timezoneInput">Timezone</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="timezoneInput" type="text" class="form-control" name="time_zone" value="{{ time_zone }}" required>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="watervaporInput">Water Vapor</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="watervaporInput" type="text" class="form-control" name="water_vapor" placeholder="0.0" value="{{ water_vapor }}" required>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="lightpollutionInput">Light Pollution</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="lightpollutionInput" type="text" class="form-control" name="light_pollution" placeholder="0.0" value="{{ light_pollution }}" required>
+              </div>              
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="daylightInput">Daylight Savings</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="daylight_saving" id="daylightYes" value="y">
+                <label class="form-check-label" for="daylightYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="daylight_saving" id="daylightNo" value="n">
+                <label class="form-check-label" for="daylightNo">No</label>
+              </div>
+              </div>   
+            </div>
+            <div class="form-group row showcase_row_area"><span class="col-12" style="border-bottom: 1px solid grey;"></span></div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="apertureInput">Aperture</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="apertureInput" type="text" class="form-control" name="aperture" placeholder="0.0" value="{{ aperture }}" required>
+              </div> 
+              <div class="col-md-2 showcase_text_area">
+                <label for="trackingInput">Tracking Accuracy</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="trackingInput" type="text" class="form-control" name="accuracy" placeholder="0.0" value="{{ accuracy }}" required>
+              </div>  
+              <div class="col-md-2 showcase_text_area">
+                <label for="mountSelect">Mount Type</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                  <select class="form-control" id="titleSelect" name="mount_type" required>
+                    <option value="" disabled selected>Select Type</option>
+                    <option value="german">German</option>
+                    <option value="fork">Fork</option>
+                    <option value="theodolite">Theodolite</option>
+                  </select>
+              </div>           
+            </div>
+            <div class="form-group row showcase_row_area"> 
+              <div class="col-md-2 showcase_text_area">
+                <label for="fovInput">FoV</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="fovInput" type="text" class="form-control" name="fov" placeholder="0.0" value="{{ fov }}" required>
+              </div> 
+              <div class="col-md-2 showcase_text_area">
+                <label for="limitingInput">Limiting Magnitude</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="limitingInput" type="text" class="form-control" name="mag" placeholder="0.0" value="{{ mag }}" required>
+              </div> 
+              <div class="col-md-2 showcase_text_area">
+                <label for="pxInput">Pixel Scale</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="pxInput" type="text" class="form-control" name="pixel" placeholder="0.0" value="{{ pixel }}" required>
+              </div>
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="elevationInput">Elevation Limit</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <input id="elevationInput" type="text" class="form-control" name="deg" placeholder="0.0" value="{{ deg }}" required>
+              </div>                          
+            </div>
+            
+            
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="johnsonBInput">Johnson B</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="JohnsonB" id="johnsonBYes" value="y">
+                <label class="form-check-label" for="johnsonBYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="JohnsonB" id="johnsonBNo" value="n">
+                <label class="form-check-label" for="johnsonBNo">No</label>
+              </div>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="johnsonVInput">Johnson V</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="JohnsonV" id="johnsonVYes" value="y">
+                <label class="form-check-label" for="johnsonVYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="JohnsonV" id="johnsonVNo" value="n">
+                <label class="form-check-label" for="johnsonVNo">No</label>
+              </div>
+              </div> 
+              <div class="col-md-2 showcase_text_area">
+                <label for="johnsonRInput">Johnson R</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="JohnsonR" id="johnsonRYes" value="y">
+                <label class="form-check-label" for="johnsonRYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="JohnsonR" id="johnsonRNo" value="n">
+                <label class="form-check-label" for="johnsonRNo">No</label>
+              </div>
+              </div>
+            </div>
+            <div class="form-group row showcase_row_area">  
+              <div class="col-md-2 showcase_text_area">
+                <label for="sdssuInput">SDSS u</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSu" id="sdssuYes" value="y">
+                <label class="form-check-label" for="sdssuYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSu" id="sdssuNo" value="n">
+                <label class="form-check-label" for="sdssuNo">No</label>
+              </div>
+              </div>              
+              <div class="col-md-2 showcase_text_area">
+                <label for="sdssgInput">SDSS g</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSg" id="sdssgYes" value="y">
+                <label class="form-check-label" for="sdssgYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSg" id="sdssgNo" value="n">
+                <label class="form-check-label" for="sdssgNo">No</label>
+              </div>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="sdssrInput">SDSS r</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSr" id="sdssrYes" value="y">
+                <label class="form-check-label" for="sdssrYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSr" id="sdssrNo" value="n">
+                <label class="form-check-label" for="sdssrNo">No</label>
+              </div>
+              </div>                  
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="sdssiInput">SDSS i</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSi" id="sdssiYes" value="y">
+                <label class="form-check-label" for="sdssiYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSi" id="sdssiNo" value="n">
+                <label class="form-check-label" for="sdssiNo">No</label>
+              </div>
+              </div>
+              <div class="col-md-2 showcase_text_area">
+                <label for="sdsszInput">SDSS z</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSz" id="sdsszYes" value="y">
+                <label class="form-check-label" for="sdsszYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline mb-1">
+                <input class="form-check-input" type="radio" name="SDSSz" id="sdsszNo" value="n">
+                <label class="form-check-label" for="sdsszNo">No</label>
+              </div>
+              </div>                  
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 showcase_text_area">
+                <label for="cameraInput">Camera Type</label>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <div class="form-check form-check-inline mb-1">
+                  <input class="form-check-input" type="radio" name="camera_type1" id="colored" value="colored">
+                  <label class="form-check-label" for="daylightYes">Colored</label>
+                </div>
+                <div class="form-check form-check-inline mb-1">
+                  <input class="form-check-input" type="radio" name="camera_type1" id="mono" value="mono">
+                  <label class="form-check-label" for="daylightNo">Mono</label>
+                </div>
+              </div>
+              <div class="col-md-2 showcase_content_area">
+                <div class="form-check form-check-inline mb-1">
+                  <input class="form-check-input" type="radio" name="camera_type2" id="cooled" value="cooled">
+                  <label class="form-check-label" for="daylightYes">Cooled</label>
+                </div>
+                <div class="form-check form-check-inline mb-1">
+                  <input class="form-check-input" type="radio" name="camera_type2" id="uncooled" value="uncooled">
+                  <label class="form-check-label" for="daylightNo">Uncooled</label>
+                </div>
+              </div>       
+            </div>
+            <div class="form-group row showcase_row_area">
+              <div class="col-md-2 mr-2"></div>
+                      <button class="btn btn-sm btn-danger mt-3" type="button" id="cancelAddEquipment"><i class="mdi mdi-close-circle mr-2"></i>Cancel</button>
+                      <span class="mr-3"></span>                      
+              <button type="submit" id="submitbtn" display="none" class="btn btn-sm btn-primary mt-3" name="button" value="add">Save</button>
+              
+              </div>        
+          
+          </form>
+            </div>
+            </div>
+          </div>
+          </div>
+          {% with messages = get_flashed_messages(category_filter=["error"]) %}
+                {% if messages %}
+                    {% for msg in messages %}
+                    <div class="alert alert-danger" role="alert"><small>{{msg}}</small></div>
+                    {% endfor %}
+                {% endif %}
+          {% endwith %}
+          {% if user_equipments %}                            
+                        <div class="row">
+                            <div class="col-12">
+                              <div class="grid">
+                                <p class="grid-header">Equipment List</p>
+                                <div class="grid-body">
+                                  <div class="item-wrapper">
+                        {% for info in user_equipments %}
+                                    <div class="row pb-3 pt-3 equipmentList">
+                                    <div class="col-10">
+                              <form method="POST">                
+                            <fieldset disabled>
+                                <div class="form-group row showcase_row_area">  
+                                    <input class="form-control" type="hidden" name='uhaveid' value="{{info.id}}" >      
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="siteInput">Site</label>
+                                  </div>
+                                  <div class="col-md-10 showcase_content_area">
+                                    <input id="siteInput" type="text" class="form-control" name="site" placeholder="Site" value="{{ info.site }}" required>
+                                  </div> 
+                                </div>
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="longitudeInput">Longitude</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="longitudeInput" type="text" class="form-control" name="longitude" placeholder="0.0" value="{{ info.longitude }}" required>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="latitudeInput">Latitude</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="latitudeInput" type="text" class="form-control" name="latitude" placeholder="0.0" value="{{ info.latitude }}" required>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="altitudeInput">Altitude</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="altitudeInput" type="text" class="form-control" name="altitude" placeholder="0.0" value="{{ info.altitude }}" required>
+                                  </div>
+                                </div>
+                                <div class="form-group row showcase_row_area">              
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="timezoneInput">Timezone</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="timezoneInput" type="text" class="form-control" name="time_zone" value="{{ info.time_zone }}" required>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="watervaporInput">Water Vapor</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="watervaporInput" type="text" class="form-control" name="water_vapor" placeholder="0.0" value="{{ info.water_vapor }}" required>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="lightpollutionInput">Light Pollution</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="lightpollutionInput" type="text" class="form-control" name="light_pollution" placeholder="0.0" value="{{ info.light_pollution }}" required>
+                                  </div>              
+                                </div>
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="daylightInput">Daylight Savings</label>
+                                  </div>                                  
+                                  <div class="col-md-2 showcase_content_area">
+                                    {% if info.daylight_saving == 'y' %}
+                                    {% set yeschecked = 'checked' %}
+                                    {% set nochecked = '' %}
+                                {% else %}
+                                    {% set yeschecked = '' %}
+                                    {% set nochecked = 'checked' %}
+                                {% endif %}
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="daylight_saving" id="daylightYes" value="y" {{ yeschecked }}>
+                                    <label class="form-check-label" for="daylightYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="daylight_saving" id="daylightNo" value="n" {{ nochecked }}>
+                                    <label class="form-check-label" for="daylightNo">No</label>
+                                  </div>
+                                  </div>   
+                                </div>
+                            </fieldset>
+                
+                                <button type="button" class="btn btn-link projectlink showEquipmentBtn">Show more ></button>
+                                <fieldset disabled>
+                                <div id="hideequipment" style="display: none;">
+                                <div class="form-group row showcase_row_area"><span class="col-12" style="border-bottom: 1px solid grey;"></span></div>
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="apertureInput">Aperture</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="apertureInput" type="text" class="form-control" name="aperture" placeholder="0.0" value="{{ info.aperture}}" required>
+                                  </div> 
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="trackingInput">Tracking Accuracy</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="trackingInput" type="text" class="form-control" name="accuracy" placeholder="0.0" value="{{ info.accuracy }}" required>
+                                  </div>  
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="mountSelect">Mount Type</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                      <select class="form-control" id="titleSelect" name="mount_type" required>
+                                        <option value="" disabled>Select Type</option>
+                                        <option value="german" {% if info.mount_type == 'german' %} selected {% endif %}>German</option>
+                                        <option value="fork" {% if info.mount_type == 'fork' %} selected {% endif %}>Fork</option>
+                                        <option value="theodolite" {% if info.mount_type == 'theodolite' %} selected {% endif %}>Theodolite</option>
+                                      </select>
+                                  </div>           
+                                </div>
+                                <div class="form-group row showcase_row_area"> 
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="fovInput">FoV</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="fovInput" type="text" class="form-control" name="fov" placeholder="0.0" value="{{ info.Fov }}" required>
+                                  </div> 
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="limitingInput">Limiting Magnitude</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="limitingInput" type="text" class="form-control" name="mag" placeholder="0.0" value="{{ info.lim_magnitude }}" required>
+                                  </div> 
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="pxInput">Pixel Scale</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="pxInput" type="text" class="form-control" name="pixel" placeholder="0.0" value=" {{ info.pixel_scale }}" required>
+                                  </div>
+                                </div>
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="elevationInput">Elevation Limit</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <input id="elevationInput" type="text" class="form-control" name="deg" placeholder="0.0" value=" {{ info.elevation_lim }}" required>
+                                  </div>                          
+                                </div>
+                                
+                                
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="johnsonBInput">Johnson B</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="JohnsonB" id="johnsonBYes" value="y" {% if info.JohnsonB == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="johnsonBYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="JohnsonB" id="johnsonBNo" value="n" {% if info.JohnsonB == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="johnsonBNo">No</label>
+                                  </div>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="johnsonVInput">Johnson V</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="JohnsonV" id="johnsonVYes" value="y" {% if info.JohnsonV == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="johnsonVYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="JohnsonV" id="johnsonVNo" value="n" {% if info.JohnsonV == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="johnsonVNo">No</label>
+                                  </div>
+                                  </div> 
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="johnsonRInput">Johnson R</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="JohnsonR" id="johnsonRYes" value="y" {% if info.JohnsonR == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="johnsonRYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="JohnsonR" id="johnsonRNo" value="n" {% if info.JohnsonR == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="johnsonRNo">No</label>
+                                  </div>
+                                  </div>
+                                </div>
+                                <div class="form-group row showcase_row_area">  
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="sdssuInput">SDSS u</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSu" id="sdssuYes" value="y" {% if info.SDSSu == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssuYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSu" id="sdssuNo" value="n" {% if info.SDSSu == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssuNo">No</label>
+                                  </div>
+                                  </div>              
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="sdssgInput">SDSS g</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSg" id="sdssgYes" value="y" {% if info.SDSSg == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssgYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSg" id="sdssgNo" value="n" {% if info.SDSSg == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssgNo">No</label>
+                                  </div>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="sdssrInput">SDSS r</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSr" id="sdssrYes" value="y" {% if info.SDSSr == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssrYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSr" id="sdssrNo" value="n" {% if info.SDSSr == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssrNo">No</label>
+                                  </div>
+                                  </div>                  
+                                </div>
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="sdssiInput">SDSS i</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSi" id="sdssiYes" value="y" {% if info.SDSSi == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssiYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSi" id="sdssiNo" value="n" {% if info.SDSSi == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdssiNo">No</label>
+                                  </div>
+                                  </div>
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="sdsszInput">SDSS z</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSz" id="sdsszYes" value="y" {% if info.SDSSz == 'y' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdsszYes">Yes</label>
+                                  </div>
+                                  <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="radio" name="SDSSz" id="sdsszNo" value="n" {% if info.SDSSz == 'n' %} checked {% endif %}>
+                                    <label class="form-check-label" for="sdsszNo">No</label>
+                                  </div>
+                                  </div>                  
+                                </div>
+                                <div class="form-group row showcase_row_area">
+                                  <div class="col-md-2 showcase_text_area">
+                                    <label for="cameraInput">Camera Type</label>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <div class="form-check form-check-inline mb-1">
+                                      <input class="form-check-input" type="radio" name="camera_type1" id="colored" value="colored" {% if info.camera_type1 == 'colored' %} checked {% endif %}>
+                                      <label class="form-check-label" for="colored">Colored</label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-1">
+                                      <input class="form-check-input" type="radio" name="camera_type1" id="mono" value="mono" {% if info.camera_type1 == 'mono' %} checked {% endif %}>
+                                      <label class="form-check-label" for="mono">Mono</label>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-2 showcase_content_area">
+                                    <div class="form-check form-check-inline mb-1">
+                                      <input class="form-check-input" type="radio" name="camera_type2" id="cooled" value="cooled" {% if info.camera_type2 == 'cooled' %} checked {% endif %}>
+                                      <label class="form-check-label" for="cooled">Cooled</label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-1">
+                                      <input class="form-check-input" type="radio" name="camera_type2" id="uncooled" value="uncooled" {% if info.camera_type2 == 'uncooled' %} checked {% endif %}>
+                                      <label class="form-check-label" for="uncooled">Uncooled</label>
+                                    </div>
+                                  </div>       
+                                </div>
+                                </div>
+                                </fieldset>
+                                <button type="button" class="btn btn-link projectlink hideEquipmentBtn" style="display: none;">Show less ^</button>
+                                <button type="submit" class="btn btn-success mt-4 btn-sm saveEquipmentBtn" name="button" value="update" style="display: none;"><i class="mdi mdi-content-save mr-1"></i>Save</button>
+                                <button type="submit" class="btn btn-danger mt-4 btn-sm deleteEquipmentBtn" name="button" style="display: none;" value="delete"><i class="mdi mdi-delete mr-1"></i>Delete</button>
+                              </form>
+                              </div>
+                              <div class="col-2">
+                                <button type="button" class="btn btn-success btn-block btn-sm mb-3 editEquipmentBtn"><i class="mdi mdi-pencil mr-1"></i>Edit</button>
+                                <button type="button" class="btn btn-danger btn-block btn-sm mb-3 cancelEquipmentBtn" style="display: none;"><i class="mdi mdi-pencil-off mr-1"></i>Cancel</button>
+                                <button type="button" class="btn btn-info btn-block btn-sm mb-3 scheduleEquipmentBtn"><i class="mdi mdi-timetable mr-1"></i>Schedule</button>  
+                              </div>
+                              </div>
+                              <hr>
+                              {% endfor%}
+                                </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        {% else %}
+                          <p>Problem</p> {{ user_equipments}}
+                        {% endif%}
+
+            
+          
+    </div>
+  </div>
+</div>
+{% endblock %}

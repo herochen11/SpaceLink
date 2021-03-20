@@ -1,0 +1,318 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block header %}
+<form action="#" class="t-header-search-box">
+  <div class="input-group">
+    <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search" autocomplete="off">
+    <button class="btn btn-primary" type="submit"><i class="mdi mdi-arrow-right-thick"></i></button>
+  </div>
+</form>
+{% endblock %}
+{% block main_content %}
+<div class="sidebar">
+  <div class="user-profile">
+    {% for info in user_profile %}
+    <div class="display-avatar animated-avatar">
+      <img class="profile-img img-lg rounded-circle" src="/static/assets/images/profile/female/image_5.png"
+        alt="profile image">
+    </div>
+    <div class="info-wrapper">
+      <p class="user-name">{{info.name}}</p>
+      <h6 class="user-title">{{info.title}}</h6>
+    </div>
+    {% endfor %}
+  </div>
+  <ul class="navigation-menu">
+    <li>
+      <a href="/accounts/index">
+        <span class="link-title">Dashboard</span>
+        <i class="mdi mdi-gauge link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/accounts/equipments">
+        <span class="link-title">Equipment</span>
+        <i class="mdi mdi-rocket link-icon"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#projects" data-toggle="collapse" aria-expanded="false">
+        <span class="link-title">Projects</span>
+        <i class="mdi mdi-presentation link-icon"></i>
+      </a>
+      <ul class="collapse navigation-submenu" id="projects">
+        <li>
+          <a href="/accounts/joinedProjects">Joined Projects</a>
+        </li>
+        <li>
+          <a href="/accounts/createProject">Create Projects</a>
+        </li>
+        <li>
+          <a href="/accounts/manageprojects">Manage Projects</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="#profile" data-toggle="collapse" aria-expanded="false">
+        <span class="link-title">Profile</span>
+        <i class="mdi mdi-account-circle link-icon"></i>
+      </a>
+      <ul class="collapse navigation-submenu" id="profile">
+        <li>
+          <a href="/accounts/profile">Profile</a>
+        </li>
+        <li>
+          <a href="/accounts/interests">Manage Interests</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="/accounts/friends">
+        <span class="link-title">View Friends</span>
+        <i class="mdi mdi-account-multiple link-icon"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="page-content-wrapper">
+  <div class="page-content-wrapper-inner">
+    <div class="content-viewport">
+      <div class="row">
+        <div class="col-12 py-5">
+          <h2>Dashboard</h2>
+          {% for info in user_profile %}
+          <p class="text-gray">Welcome aboard, {{info.name}}</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12" id="recommendedProjects">
+          <div class="col-lg-12">
+            <div class="grid">
+              <h5 class="grid-header">Recommended Projects</h5>
+              <div class="list-group">
+                {% macro sentence_case(text) %}
+                {{ text[0]|upper}}{{text[1:] | replace('_', ' ') }}
+                {% endmacro %}
+                {% macro yesno(text) %}
+                {% if text == 'y' %}
+                {{'Yes'}}
+                {% else %}
+                {{'No'}}
+                {% endif %}
+                {% endmacro %}
+                {% for pro in projects %}
+                <div class="list-group-item flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <input class="form-control" type="hidden" name='PID' value="{{pro.PID}}">
+                    <h6 class="mb-1 text-success">{{pro.title}}</h6>
+                  </div>
+                  <p class="mb-1"><strong>{{sentence_case(pro.project_type)}}</strong></p>
+                  <p class="mb-1">{{pro.description}}</p>
+
+                  <div class="accordion" id="projectExample{{ loop.index }}">
+                    <div class="card">
+                      <div class="card-header" id="heading{{ loop.index }}">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link projectlink collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseReq{{ loop.index }}" aria-expanded="false"
+                            aria-controls="collapseReq{{ loop.index }}">
+                            See requirements
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="collapseReq{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}"
+                        data-parent="#projectExample{{ loop.index}}">
+                        <div class="card-body">
+                          <dl class="row">
+                            <dt class="col-md-3">
+                              Aperture Upper Limit:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{pro.aperture_upper_limit}}
+                            </dd>
+                            <dt class="col-md-3">
+                              Aperture Lower Limit:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{pro.aperture_lower_limit}}
+                            </dd>
+                          </dl>
+                          <dl class="row">
+                            <dt class="col-md-3">
+                              FoV Upper Limit:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{pro.FoV_upper_limit}}
+                            </dd>
+                            <dt class="col-md-3">
+                              FoV Lower Limit:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{pro.FoV_lower_limit}}
+                            </dd>
+                          </dl>
+                          <dl class="row">
+                            <dt class="col-md-3">
+                              Pixel Scale Upper Limit:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{pro.pixel_scale_upper_limit}}
+                            </dd>
+                            <dt class="col-md-3">
+                              Pixel Scale Lower Limit:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{pro.pixel_scale_lower_limit}}
+                            </dd>
+                          </dl>
+                          <dl class="row">
+                            <dt class="col-md-2">
+                              Mount Type:
+                            </dt>
+                            <dd class="col-md-2">
+                              {{sentence_case(pro.mount_type)}}
+                            </dd>
+                            <dt class="col-md-2">
+                              Camera Type:
+                            </dt>
+                            <dd class="col-md-5">
+                              {{sentence_case(pro.camera_type1)}}, {{sentence_case(pro.camera_type2)}}
+                            </dd>
+                          </dl>
+
+                          <dl class="row">
+                            <dt class="col-md-2">
+                              Johnson B:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.JohnsonB)}}
+                            </dd>
+                            <dt class="col-md-2">
+                              Johnson V:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(JohnsonV)}}
+                            </dd>
+                            <dt class="col-md-2">
+                              Johnson R:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.JohnsonR)}}
+                            </dd>
+
+                            <dt class="col-md-2">
+                              <label for="sdssuInput">SDSS u:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.SDSSu)}}
+                            </dd>
+                          </dl>
+                          <dl class="row">
+                            <dt class="col-md-2">
+                              SDSS g:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.SDSSg)}}
+                            </dd>
+                            <dt class="col-md-2">
+                              SDSS r:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.SDSSr)}}
+                            </dd>
+                            <dt class="col-md-2">
+                              SDSS i:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.SDSSi)}}
+                            </dd>
+                            <dt class="col-md-2">
+                              SDSS z:
+                            </dt>
+                            <dd class="col-md-1">
+                              {{yesno(pro.SDSSz)}}
+                            </dd>
+                          </dl>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-header" id="manager{{ loop.index }}">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link collapsed projectlink getPMInfo" type="button"
+                            data-toggle="collapse" data-target="#managerID{{ loop.index }}" aria-expanded="false"
+                            aria-controls="managerID{{ loop.index }}">
+                            Project Manager
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="managerID{{ loop.index }}" class="collapse" aria-labelledby="manager{{ loop.index }}"
+                        data-parent="#projectExample{{ loop.index }}">
+
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-header" id="target{{ loop.index }}">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link projectlink collapsed getTargetInfo" type="button"
+                            data-toggle="collapse" data-target="#targetID{{ loop.index }}" aria-expanded="false"
+                            aria-controls="targetID{{ loop.index }}">
+                            Targets
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="targetID{{ loop.index }}" class="collapse" aria-labelledby="target{{ loop.index }}"
+                        data-parent="#projectExample{{ loop.index }}">
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col text-right">
+                      <button type="button" class="btn btn-info col-md-1 mt-1 joinProject">Join</button>
+                    </div>
+
+                  </div>
+                </div>
+                <hr class="col-11">
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="grid">
+            <p class="grid-header">Recommended Users</p>
+            <div class="grid-body">
+              <div class="row">
+                {% for info in recommended_user%}
+                <div class="col-4">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <p><img class=" img-fluid" src="/static/assets/images/profile/female/image_9.png"
+                          alt="card image"></p>
+                      <input type="hidden" value="{{info.UID}}" name="UID">
+                      <h4 class="card-title">{{info.name}}</h4>
+                      <p class="card-text">{{info.title}}</p>
+                      <button class="btn btn-primary btn-sm addFriend">Add Friend</button>
+                    </div>
+                  </div>
+                </div>
+                {% endfor%}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}
