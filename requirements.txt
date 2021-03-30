@@ -5,3 +5,5 @@ passlib
 astropy
 astroplan
 flask-paginate
+ephem
+psycopg2

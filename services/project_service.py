@@ -23,7 +23,7 @@ def get_project_detail(PID: int):
     project = graph.run(query, PID = PID).data()
     return project
 
-# this function will return project which user can join
+# this function will return project which user can join (equipment based)
 def get_project(usr: str)->Optional[Project]:
     
     #get the information of user's equipment
@@ -79,7 +79,14 @@ def get_project(usr: str)->Optional[Project]:
 
     return result
 
+# return all the interest targets of a user
+def get_user_interest(usr: str):
+    query = "match (x:user{email:$usr})-[r:ULikeT]->(t) return t.name as name, t.TID as TID"
+    interest = graph.run(query, usr=usr).data()
 
+    return interest
+
+# choose the project with user's interested targets (interest based)
 def get_project_filter(usr: str, project_list: list):
     random.shuffle(project_list)
     interest = get_user_interest(usr)
@@ -107,6 +114,7 @@ def get_project_filter(usr: str, project_list: list):
     else:
         goal = 10
 
+    # if the total of chosen projects is less than 10 or goal, random append projects to the list
     exist = 0
     if len(chosen_project) < goal:
         for i in range(goal-len(chosen_project)):
@@ -123,6 +131,29 @@ def get_project_filter(usr: str, project_list: list):
             chosen_project.append(project_list[rand_index])
 
     return chosen_project
+
+# 0331 rank joined projects
+def get_project_default_priority(projects):
+    ranked_projects = sorted(projects, key=lambda k:k['project_type'], reverse=True)
+
+    return ranked_projects
+
+# 0331 get user the priority of users' projects
+def get_project_orderby_priority(usr):
+    query = "MATCH (x:user {email:$usr}) return x.project_priority"
+    pid_list = graph.run(query, usr=usr).data()
+    
+    ori_project_priority = []
+    for pid in pid_list:
+        query = "MATCH (p:project {PID:$pid}) return p"
+        ori_project_priority += graph.run(query, pid=pid).data()
+
+    return ori_project_priority
+
+# 0331 update the priority of users' projects
+def upadte_project_priority(usr, pid_list):
+    query = "MATCH (x:user {email:$usr}) set x.project_priority=$project_priority"
+    graph.run(query, usr=usr, project_priority=pid_list)
 
 #get a project observe target
 def get_project_target(pid: int):

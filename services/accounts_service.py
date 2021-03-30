@@ -3,6 +3,7 @@ from typing import Optional
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 from services.classes import User, Target, Equipments, Project, Schedule
 from datetime import datetime, timedelta
+from services.schedule_service import create_schedule
 
 import astro.declination_limit_of_location as declination
 import astro.astroplan_calculations as schedule
@@ -180,13 +181,6 @@ def create_user_target(usr: str, TID: int):
 
     graph.run(query, usr=usr, TID=TID, uliketid=cnt)
 
-#return all the interest targets of a user
-def get_user_interest(usr: str):
-    query = "match (x:user{email:$usr})-[r:ULikeT]->(t) return t.name as name, t.TID as TID"
-    interest = graph.run(query, usr=usr).data()
-
-    return interest
-
 #delete a user's interest target
 def delete_user_insterest(usr: str, TID: int):
     query = "match (x:user{email:$usr})-[r:ULikeT]->(t:target{TID:$TID}) delete r"
@@ -244,6 +238,3 @@ def get_eid(uhaveid):
     eid = int(eid[0]['EID'])
 
     return eid
-
-
-

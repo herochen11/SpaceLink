@@ -15,6 +15,7 @@ class User(GraphObject):
     hashed_password = Property()
     created_on = Property()
     last_logon = Property()
+    project_priority = Property() # 0331
     UhaveE = RelatedTo("Equipments","OWNER")
     Manage = RelatedTo("Projects","OWN")   
 

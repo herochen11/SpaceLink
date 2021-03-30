@@ -205,6 +205,44 @@ def manageProject():
     else:
         return redirect(url_for("login_get"))
 
+# 0331 show the ranking of users' joined projects
+@app.route('/accounts/rankedProjects', methods=['GET'])
+def getRankedProjects():
+    # get user customized ranking frome database
+    if "usr" in session:
+        usr = session["usr"]
+        session["usr"] = usr
+        user_profile = get_profile(usr)
+        projects = get_project_orderby_priority(usr)
+        return render_template("accounts/joinedProjects.html", user_profile=user_profile, projects = projects)
+    else:
+        return redirect(url_for("login_get"))
+
+# 0331 for users to rank their joined projects
+@app.route('/accounts/rankedProjects', methods=['POST'])
+def postRankedProjects():
+    # get user customized ranking
+    ''' TODO '''
+    pid_list = []
+    # expected a PID list
+
+    if "usr" in session:
+        usr = session["usr"]
+        session["usr"] = usr
+        user_profile = get_profile(usr)
+        
+        # only when user click the save button would update the database
+        if request.form.get('button') == 'save':
+            upadte_project_priority(usr, pid_list)
+
+        if request.form.get('button') == 'reset':
+            projects = get_project_join(usr)
+            projects = get_project_default_priority(projects)
+
+        return render_template("accounts/joinedProjects.html", user_profile=user_profile, projects = projects)
+    else:
+        return redirect(url_for("login_get"))
+
 #created for ajax to get target for projects on dashboard
 @app.route('/getTargetInfo', methods=['POST'])
 def getTargetInfo():

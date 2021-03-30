@@ -3,6 +3,7 @@ from typing import Optional
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 from services.classes import User, Target, Equipments, Project, Schedule
 from datetime import datetime, timedelta
+from services.project_service import get_project_target
 
 import astro.declination_limit_of_location as declination
 import astro.astroplan_calculations as schedule
@@ -92,6 +93,33 @@ def save_schedule(SID: int, last_update: str, observe_section: list):
     query_save_schedule = "match (s:schedule{SID:$SID}) set s.last_update=$last_update, s.observe_section=$observe_section"
 
     graph.run(query_save_schedule, SID=SID, last_update=last_update, observe_section=observe_section)
+
+# 0331 generate default schedule by sorting target
+def generate_default_schedule(usr):
+    query = "MATCH (x:user {email:$usr}) return x.project_priority"
+    pid_list = graph.run(query, usr=usr).data()
+
+    project_target = get_project_target(pid_list[0])
+    sorted_target = sort_project_target(project_target)
+
+    return sorted_target
+
+# 0331 sort targets' priority
+def sort_project_target(project_target):
+    # sort algorithm
+    '''TODO'''
+
+    # shuffle for now
+    return random.shuffle(project_target)
+
+#get the equipment id
+def get_eid(uhaveid):
+    query_eid = "MATCH (x:user)-[h:UhaveE{uhaveid:$uhaveid}]->(e:equipments) return e.EID as EID"
+    eid = graph.run(query_eid, uhaveid=uhaveid).data()
+
+    eid = int(eid[0]['EID'])
+
+    return eid
 
 #get the observable time of all the targets in the target list
 def get_observable_time(usr: str, uhaveid: int, tid_list: list):
