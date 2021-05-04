@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 from services.project_service import get_project_target
 
 import astro.declination_limit_of_location as declination
-import astro.astroplan_calculations as schedule
-import astro.nighttime_calculations as night
-import ephem
+import astro.astroplan_calculations as obtime
 import random
 
 graph = db_auth()
 
+# needs modification
+'''
 #create a new schedule for a equipment
 def create_schedule(eid: int, uhaveid: int):
     # get EID
@@ -93,14 +93,19 @@ def save_schedule(SID: int, last_update: str, observe_section: list):
     query_save_schedule = "match (s:schedule{SID:$SID}) set s.last_update=$last_update, s.observe_section=$observe_section"
 
     graph.run(query_save_schedule, SID=SID, last_update=last_update, observe_section=observe_section)
+'''
+
 
 # 0331 generate default schedule by sorting target
-def generate_default_schedule(usr):
+def generate_default_schedule(usr: str, uhaveid: int):
     query = "MATCH (x:user {email:$usr}) return x.project_priority"
     pid_list = graph.run(query, usr=usr).data()
 
-    project_target = get_project_target(pid_list[0])
+    # arrange the project with the highest priority first
+    pid = pid_list[0]
+    project_target = get_project_target(pid)
     sorted_target = sort_project_target(project_target)
+    default_schedule, default_schedule_chart = get_observable_time(uhaveid, pid, sorted_target)
 
     return sorted_target
 
@@ -112,7 +117,7 @@ def sort_project_target(project_target):
     # shuffle for now
     return random.shuffle(project_target)
 
-#get the equipment id
+# get the equipment id
 def get_eid(uhaveid):
     query_eid = "MATCH (x:user)-[h:UhaveE{uhaveid:$uhaveid}]->(e:equipments) return e.EID as EID"
     eid = graph.run(query_eid, uhaveid=uhaveid).data()
@@ -121,96 +126,111 @@ def get_eid(uhaveid):
 
     return eid
 
-#get the observable time of all the targets in the target list
-def get_observable_time(usr: str, uhaveid: int, tid_list: list):
-    # hour array
-    hour = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+# 0505 get the time need to observe of each target in projects
+def get_time2observe(pid, tid):
+    query = "MATCH (p:project{PID:$pid})-[r:PHaveT]->(t:target{TID:$tid}) RETURN r.Time_to_Observe as T2O"
+    t2o = graph.run(query, pid=pid, tid=tid).data()
 
-    # get current time for further calculation
-    current_time = datetime.now().replace(microsecond=0, second=0, minute=0) + timedelta(hours=1)
-    current_time_sec = str(current_time).split('.')[0]
-    current_hour = current_time_sec.split(" ")[1].split(":")[0]
+    t2o = t2o[0]['T2O']
 
-    # create current hour array
-    index = hour.index(current_hour)
-    current_hour_array = []
-    for i in range(24):
-        current_hour_array.append(hour[index])
-        if index == 23:
-            index = 0
-        else:
-            index += 1
-    #print(current_hour_array)
-    
+    return t2o
+
+# 0421 + 0505
+def get_observable_time(uhaveid: int, pid: int, sorted_target: list):
+    current_time = datetime.now()
+    base_time = datetime.strptime(str(current_time).split(' ')[0]+' 12:00', '%Y-%m-%d %H:%M')
+    observability = []
+    tid_list = []
+
     # get information from uhavee and equipment table
     query_relation = "MATCH (x:user)-[h:UhaveE{uhaveid:$uhaveid}]->(e:equipments) return h.longitude as longitude, h.latitude as latitude, h.altitude as altitude, e.elevation_lim as elevation_lim"
     eq_info = graph.run(query_relation, uhaveid=uhaveid).data()
-
     longitude = float(eq_info[0]['longitude'])
     latitude = float(eq_info[0]['latitude'])
     altitude = float(eq_info[0]['altitude'])
     elevation_lim = float(eq_info[0]['elevation_lim'])
 
-    # get target information and run the ta's schedule function
-    format = '%Y-%m-%d %H:%M:%S'
-    # tid_list = [856, 266, 377, 488, 5, 100, 348, 7]
-    
-    target_data = []
-    print(len(tid_list))
+    for tar in range(sorted_target):
+        tid = int(tar[0]['TID'])
+        ra = float(tar[0]['ra'])
+        dec = float(tar[0]['dec'])
+
+        # get get time still need to observe of this target
+        t2o = get_time2observe(pid, tid)
+        t2o_min = t2o * 60
+
+        # get the observable time
+        t_start, t_end = obtime.run(uhaveid, longitude, latitude, altitude, elevation_lim, tid, ra, dec, base_time)
+
+        # make the observability chart to each target
+        if str(t_start) != 'nan' and str(t_end) != 'nan':
+            t_start = datetime.strptime(str(t_start)[:16], '%Y-%m-%dT%H:%M')
+            t_end = datetime.strptime(str(t_end)[:16], '%Y-%m-%dT%H:%M')
+
+            tid_list.append(tid)
+
+            # offset from base time to target rise time 
+            if t_start > base_time:
+                t_offset = t_start-base_time
+            else:
+                t_offset = 0
+            
+            # how long can the target observation could last
+            t_last = t_end-t_start
+            # if the target doesn't need to be observed thant long
+            if timedelta(minutes=t2o_min) < t_last:
+                t_last = timedelta(minutes=t2o_min)
+
+            # t_last = (t_end-t_start).seconds//60
+            observability.append([t_start, t_end, t_offset, t_last])
+
+    # calculate default schedule
+    default_schedule, default_schedule_chart = calculate_default_schedule(base_time, tid_list, observability)
+
+    return default_schedule, default_schedule_chart
+
+# 0505
+def calculate_default_schedule(base_time, tid_list, observability):
+    default_schedule = []
+    default_schedule_chart = [-1]*1440
+    observable_time = []
+    temp = [-1]*1440
     for i in range(len(tid_list)):
-        # create observation array
-        observe = [0]*24
+        # reset temp
+        temp = [-1]*1440
+        if observability[i][2] != 0:
+            t_offset = observability[i][2].seconds//60
+        else:
+            t_offset = 0
+        t_last = observability[i][3].seconds//60
+        # set observable minute of each target in the array to its TID
+        for j in range(t_offset, t_offset+t_last+1):
+            temp[j] = tid_list[i]
+        observable_time.append(temp.copy())
 
-        query_target = "match (t:target) where t.TID=$tid return t.TID as TID, t.name as name, t.longitude as ra, t.latitude as dec"
-        tar_info = graph.run(query_target, tid=tid_list[i]['TID']).data()
+    last_tid = -1
+    tid_schedule = []
+    divide_time = []
+    # put targets into default schedule
+    for i in range(1440):
+        for j in range(len(tid_list)):
+            if observable_time[j][i] != -1:
+                default_schedule_chart[i] = observable_time[j][i]
+                break
+        # calculate the time between two targets
+        if default_schedule_chart[i] != last_tid:
+            delta = timedelta(minutes=i)
+            # print(base_time+delta)
+            tid_schedule.append(last_tid)
+            divide_time.append(base_time+delta)
+        last_tid = default_schedule_chart[i]
 
-        tid = int(tar_info[0]['TID'])
-        ra = float(tar_info[0]['ra'])
-        dec = float(tar_info[0]['dec'])
-        name = str(tar_info[0]['name'])
+    for i in range(len(tid_schedule)):
+        temp = {}
+        if tid_schedule[i] != -1:
+            temp['TID'] = tid_schedule[i]
+            temp['Start'] = divide_time[i-1]
+            temp['End'] = divide_time[i]-timedelta(minutes=1)
+            default_schedule.append((temp.copy()))
 
-        t_start, t_end = schedule.run(uhaveid, longitude, latitude, altitude, elevation_lim, tid, ra, dec, current_time)
-        print(tid)
-        print('start observation: %s \nend observation %s' % (t_start, t_end))
-
-        if str(t_start) != 'nan' and str(t_end)  != 'nan':
-            t1 = str(t_start).split('.')[0].replace("T", " ")
-            t2 = str(t_end).split('.')[0].replace("T", " ")
-
-            time_left2start = datetime.strptime(t1, format) - datetime.strptime(current_time_sec, format)
-            time_left2end = datetime.strptime(t2, format) - datetime.strptime(current_time_sec, format)
-            # print('time left to start: ', time_left2start)
-            # print('time_left to end:   ', time_left2end)
-
-            o1 = int(str(time_left2start).split(":")[0])
-            o2 = int(str(time_left2end).split(":")[0])+1
-            for j in range(24):
-                if j >= o1-1 and j < o2:
-                    observe[j] = 1
-            t_data = {'TID':tid_list[i]['TID'], 'name':name, 'start':t1.split(" ")[1], 'end':t2.split(" ")[1], 'time_section':observe, 'hour':current_hour_array}
-        # else:
-        #     observe = [0]*24
-        #     t_data = {'TID':tid_list[i]['TID'], 'name':name, 'start':str(t_start), 'end':str(t_end), 'time_section':observe, 'hour':current_hour_array}
-
-            target_data.append(t_data)
-        # print(t_data)
-
-    return target_data
-
-#caluclate the night time based on user's time zone
-def get_night_time(uhaveid):
-    query_eq = "MATCH (x:user)-[r:UhaveE{uhaveid:$uhaveid}]->(e:equipments) RETURN r.longitude as longitude, r.latitude as latitude, r.altitude as altitude"
-    eq_info = graph.run(query_eq, uhaveid=uhaveid).data()
-
-    longitude = str(eq_info[0]['longitude'])
-    latitude = str(eq_info[0]['latitude'])
-    altitude = float(eq_info[0]['altitude'])
-
-    try:
-        observe_section, current_time = night.night(longitude, latitude, altitude)
-    except ephem.NeverUpError:
-        observe_section = [-1]*24
-    except ephem.AlwaysUpError:
-        observe_section = [-2]*24
-    
-    return observe_section, current_time
+    return default_schedule, default_schedule_chart

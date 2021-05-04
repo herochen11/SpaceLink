@@ -157,8 +157,11 @@ def upadte_project_priority(usr, pid_list):
 
 #get a project observe target
 def get_project_target(pid: int):
+    # consider to delete the targets that have reached the goal of observe time
+
     query = "MATCH x=(p:project{PID:$pid})-[r:PHaveT]->(t:target) RETURN t.name as name, t.latitude as lat, t.longitude as lon, t.TID as TID"
     project_target = graph.run(query, pid=pid).data()
+
     return project_target
 
 #create a new project
