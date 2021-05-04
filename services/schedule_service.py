@@ -111,7 +111,7 @@ def generate_default_schedule(usr: str, uhaveid: int):
 
 # 0331 sort targets' priority
 def sort_project_target(project_target):
-    # sort algorithm
+    # sort algorithm (remember to filter out the target that t2o = 0)
     '''TODO'''
 
     # shuffle for now
@@ -157,7 +157,6 @@ def get_observable_time(uhaveid: int, pid: int, sorted_target: list):
 
         # get get time still need to observe of this target
         t2o = get_time2observe(pid, tid)
-        t2o_min = t2o * 60
 
         # get the observable time
         t_start, t_end = obtime.run(uhaveid, longitude, latitude, altitude, elevation_lim, tid, ra, dec, base_time)
