@@ -164,6 +164,15 @@ def get_project_target(pid: int):
 
     return project_target
 
+#get a project equipment's target list
+def get_project_equipment_TargetList(pid: int, eid: int):
+    # consider to delete the targets that have reached the goal of observe time
+
+    query = "MATCH x=(p:project{PID:$pid})-[r:PHaveE]->(e:Equipment{EID:$eid}) RETURN r.target_list as target_list"
+    project_target = graph.run(query, pid=pid, eid=eid).data()
+
+    return project_target[0]['target_list']
+
 #create a new project
 def create_project(usr: str,title: str,project_type: str,description: str,aperture_upper_limit: float,aperture_lower_limit: float,FoV_upper_limit: float,
         FoV_lower_limit: float,pixel_scale_upper_limit: float,pixel_scale_lower_limit: float,mount_type: str,camera_type1: str,camera_type2: str,JohnsonB: str,
@@ -261,14 +270,15 @@ def user_manage_projects_get(usr: str):
     return project
 
 #add a new target for project
-def create_project_target(usr: str, PID: int, TID: int, JohnsonB: str, JohnsonR: str, JohnsonV: str,SDSSu: str,SDSSg: str,SDSSr: str,SDSSi: str,SDSSz: str):
-    query="MATCH (p:project {PID: $PID}) MATCH (t:target {TID:$TID}) create (p)-[pht:PHaveT {phavetid:$phavetid, JohnsonB:$JohnsonB, JohnsonV:$JohnsonV, JohnsonR:$JohnsonR, SDSSu:$SDSSu, SDSSg:$SDSSg, SDSSr:$SDSSr, SDSSi:$SDSSi, SDSSz:$SDSSz}]->(t) return pht.phavetid"
+def create_project_target(usr: str, PID: int, TID: int, JohnsonB: str, JohnsonR: str, JohnsonV: str,SDSSu: str,SDSSg: str,SDSSr: str,SDSSi: str,SDSSz: str, time2observe: dict):
+    query="MATCH (p:project {PID: $PID}) MATCH (t:target {TID:$TID}) create (p)-[pht:PHaveT {phavetid:$phavetid, JohnsonB:$JohnsonB, JohnsonV:$JohnsonV, JohnsonR:$JohnsonR, SDSSu:$SDSSu, SDSSg:$SDSSg, SDSSr:$SDSSr, SDSSi:$SDSSi, SDSSz:$SDSSz, Time_to_Observe:$time2observe}]->(t) return pht.phavetid"
+    update_project_equipment_observe_list(usr,PID,TID,JohnsonB, JohnsonR, JohnsonV,SDSSu,SDSSg,SDSSr,SDSSi,SDSSz)
     count = graph.run("MATCH ()-[pht:PHaveT]->() return pht.phavetid  order by pht.phavetid DESC limit 1 ").data()
     if len(count) == 0:
         cnt = 0
     else:
         cnt = count[0]['pht.phavetid']+1
-    result = graph.run(query, PID = PID, TID = TID, phavetid = cnt, JohnsonB = JohnsonB, JohnsonR = JohnsonR, JohnsonV = JohnsonV, SDSSg = SDSSg, SDSSi = SDSSi, SDSSr = SDSSr, SDSSu = SDSSu, SDSSz = SDSSz).data()
+    result = graph.run(query, PID = PID, TID = TID, phavetid = cnt, JohnsonB = JohnsonB, JohnsonR = JohnsonR, JohnsonV = JohnsonV, SDSSg = SDSSg, SDSSi = SDSSi, SDSSr = SDSSr, SDSSu = SDSSu, SDSSz = SDSSz, Time_to_Observe= time2observe).data()
     return result
 
 #
@@ -279,7 +289,7 @@ def get_qualified_equipment(usr: str, PID: int):
         " return pht.JohnsonB as JohnsonB, pht.JohnsonV as JohnsonV, pht.JohnsonR as JohnsonR, pht.SDSSu as SDSSu, pht.SDSSg as SDSSg, pht.SDSSr as SDSSr , pht.SDSSi as SDSSi, pht.SDSSz as SDSSz"
     ", t.TID as TID, t.name as name, t.latitude as dec", PID=PID).data()
     
-    qualified_eid_list = []
+    qualified_eid_list = dict()
     for i in range(len(equipment)):
         for j in range(len(project_target)):
             if equipment[i]['jb'] == 'n':
@@ -304,12 +314,12 @@ def get_qualified_equipment(usr: str, PID: int):
             if float(equipment[i]['declination']) > 0 and float(project_target[j]['dec']) > float(equipment[i]['declination']):
                 continue
 
-            qualified_eid_list.append(int(equipment[i]['EID']))
+            qualified_eid_list.append({'EID':int(equipment[i]['EID']), 'declination':float(equipment[i]['declination'])})
             break
 
     return qualified_eid_list
 
-#this function is uesd to test, the user will auto join the project
+#this function is uesd for test, the user will auto join the project
 def auto_join(usr: str, PID: int):
     # create user-project relationship
     query = "MATCH (x:user {email:$usr}) MATCH (p:project {PID:$PID})  create (x)-[:Member_of {memberofid: $memberofid, join_time: $join_time}]->(p)"
@@ -323,14 +333,15 @@ def auto_join(usr: str, PID: int):
     graph.run(query, usr = usr, PID = PID, memberofid = cnt, join_time = time[0]['time'])
     # create equipment-project relationship
     qualified_eid_list = get_qualified_equipment(usr, PID)
-    query = "MATCH (p:project {PID:$PID}) MATCH (e:equipments {EID:$EID}) CREATE (p)-[rel:PhaveE {phaveeid:$phaveeid}]->(e)"
+    query = "MATCH (p:project {PID:$PID}) MATCH (e:equipments {EID:$EID}) CREATE (p)-[rel:PhaveE {phaveeid:$phaveeid, target_list:$target_list, declination_limit: $declination}]->(e)"
     for i in range(len(qualified_eid_list)):
         count = graph.run("MATCH ()-[rel:PhaveE]->() return rel.phaveeid order by rel.phaveeid DESC limit 1").data()
         if len(count) == 0:
             cnt = 0
         else:
             cnt = count[0]['rel.phaveeid']+1
-        graph.run(query, PID=PID, EID=qualified_eid_list[i], phaveeid=cnt)
+        target_list = initial_equipment_target_list(usr,qualified_eid_list[i]['EID'],PID)
+        graph.run(query, PID=PID, EID=qualified_eid_list[i]['EID'], phaveeid=cnt,declination = qualified_eid_list[i]['declination'], target_list = targer_list )
 
 #this function is uesd to test, the user will auto leave the project
 def auto_leave(usr: str, PID: int):
@@ -438,7 +449,7 @@ def get_project_equipment(PID: int):
     query = "MATCH (p:project {PID:$PID})-[rel:PhaveE]->(e:equipments) return e.EID as eid,"\
         "e.aperture as aperture, e.Fov as Fov, e.pixel_scale as pixel_scale, e.tracking_accuracy as accuracy, e.lim_magnitude as lim_magnitude, e.elevation_lim as elevation_lim,"\
         "e.mount_type as mount_type, e.camera_type1 as camera_type1, e.camera_type2 as camera_type2, e.JohnsonB as JohnsonB, e.JohnsonR as JohnsonR, e.JohnsonV as JohnsonV, e.SDSSu as SDSSu,"\
-        "e.SDSSg as SDSSg, e.SDSSr as SDSSr, e.SDSSi as SDSSi,e.SDSSz as SDSSz"
+        "e.SDSSg as SDSSg, e.SDSSr as SDSSr, e.SDSSi as SDSSi,e.SDSSz as SDSSz, rel.declination as declination"
     eq_list = graph.run(query, PID =PID).data()
     return eq_list
 
@@ -532,3 +543,81 @@ def fliter_project_target(usr: str, PID: int):
     print(len(target))
 
     return target
+
+#Update a equipment target list when add new target to project
+def update_project_equipment_observe_list(usr: str, PID: int, TID: int, JohnsonB: str, JohnsonR: str, JohnsonV: str,SDSSu: str,SDSSg: str,SDSSr: str,SDSSi: str,SDSSz: str):
+
+    target_lat = graph.run("MATCH(t:target{TID:$TID}) return t.latitude as lat", TID = TID).data()
+    
+    eq_list = get_project_equipment(PID)
+    if count(eq_list) == 0:
+        return 0
+    else :
+        for i in range(len(eq_list)):
+            if eq_list[i]['JohnsonB'] == 'n':
+                if project_target[j]['JohnsonB'] == 'y': continue
+            if eq_list[i]['JohnsonV'] == 'n':
+                if project_target[j]['JohnsonV'] == 'y': continue
+            if eq_list[i]['JohnsonR'] == 'n':
+                if project_target[j]['JohnsonR'] == 'y': continue
+            if eq_list[i]['SDSSu'] == 'n':
+                if project_target[j]['SDSSu'] == 'y': continue
+            if eq_list[i]['SDSSg'] == 'n':
+                if project_target[j]['SDSSg'] == 'y': continue
+            if eq_list[i]['SDSSr'] == 'n':
+                if project_target[j]['SDSSr'] == 'y': continue
+            if eq_list[i]['SDSsi'] == 'n':
+                if project_target[j]['SDSSi'] == 'y': continue
+            if eq_list[i]['SDSSz'] == 'n':
+                if project_target[j]['SDSSz'] == 'y': continue
+
+            # filter with equipment declination limit
+            if float(eq_list[i]['declination']) <= 0 and float( target_lat[0]['lat']) < float(eq_list[i]['declination']):
+                continue
+            if float(eq_list[i]['declination']) > 0 and float( target_lat[0]['lat']) > float(eq_list[i]['declination']):
+                continue
+            
+            query = "MATCH (p:project {PID: $PID})-[rel:PHaveE]->(e:equipment{EID:$EID}) return rel.target_list as list"
+            target_list = graph.run(query).data()
+            target_list.append(TID)
+            query = "MATCH (p:project {PID: $PID})-[rel:PHaveE]->(e:equipment{EID:$EID}) set rel.target_list={target_list:$target_list} "
+            graph.run(query, PID = PID, EID = eq_list[i]['eid'], target_list = target_list)
+
+#initial a equipment target list when create project_equipment relationship
+def initial_equipment_target_list(usr: str, EID: int, PID: int):
+            
+    project_target = graph.run("MATCH (p:project {PID: $PID})-[pht:PHaveT]->(t:target) " \
+        " return pht.JohnsonB as JohnsonB, pht.JohnsonV as JohnsonV, pht.JohnsonR as JohnsonR, pht.SDSSu as SDSSu, pht.SDSSg as SDSSg, pht.SDSSr as SDSSr , pht.SDSSi as SDSSi, pht.SDSSz as SDSSz"
+    ", t.TID as TID, t.name as name, t.latitude as lat, t.longitude as lon", PID = PID).data()
+
+    query_eid = "MATCH (x:user{email:$usr})-[r:UhaveE]->(e:equipments{EID:$EID}) RETURN e.EID as EID, e.JohnsonB as jb,e.JohnsonV as jv, e.JohnsonR as jr, e.SDSSu as su, e.SDSSg as sg, e.SDSSr as sr , e.SDSSi as si, e.SDSSz as sz, r.declination_limit as declination"
+    equipment = graph.run(query_eid, usr=usr,EID=EID).data()
+
+    target = list()
+    for j in range(len(project_target)):
+        if equipment[0]['jb'] == 'n':
+            if project_target[j]['JohnsonB'] == 'y': continue
+        if equipment[0]['jv'] == 'n':
+            if project_target[j]['JohnsonV'] == 'y': continue
+        if equipment[0]['jr'] == 'n':
+            if project_target[j]['JohnsonR'] == 'y': continue
+        if equipment[0]['su'] == 'n':
+            if project_target[j]['SDSSu'] == 'y': continue
+        if equipment[0]['sg'] == 'n':
+            if project_target[j]['SDSSg'] == 'y': continue
+        if equipment[0]['sr'] == 'n':
+            if project_target[j]['SDSSr'] == 'y': continue
+        if equipment[0]['si'] == 'n':
+            if project_target[j]['SDSSi'] == 'y': continue
+        if equipment[0]['sz'] == 'n':
+            if project_target[j]['SDSSz'] == 'y': continue
+        # filter with equipment declination limit
+        if float(equipment[0]['declination']) <= 0 and float(project_target[j]['lat']) < float(equipment[0]['declination']):
+            continue
+        if float(equipment[0]['declination']) > 0 and float(project_target[j]['lat']) > float(equipment[0]['declination']):
+            continue
+
+        target.append(int(project_target[j]['TID']))
+    
+    return target
+

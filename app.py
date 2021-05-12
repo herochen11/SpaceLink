@@ -7,6 +7,7 @@ from services.schedule_service import *
 from services.friend_service import *
 from services.target_service import *
 from services.postgres_service import *
+from services.log_service import *
 import os
 import random
 

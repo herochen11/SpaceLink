@@ -3,7 +3,7 @@ from typing import Optional
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 from services.classes import User, Target, Equipments, Project, Schedule
 from datetime import datetime, timedelta
-from services.project_service import get_project_target
+from services.project_service import get_project_equipment_TargetList
 
 import astro.declination_limit_of_location as declination
 import astro.astroplan_calculations as obtime
@@ -97,13 +97,13 @@ def save_schedule(SID: int, last_update: str, observe_section: list):
 
 
 # 0331 generate default schedule by sorting target
-def generate_default_schedule(usr: str, uhaveid: int):
+def generate_default_schedule(usr: str, uhaveid: int,EID: int):
     query = "MATCH (x:user {email:$usr}) return x.project_priority"
     pid_list = graph.run(query, usr=usr).data()
 
     # arrange the project with the highest priority first
     pid = pid_list[0]
-    project_target = get_project_target(pid)
+    project_target = get_project_equipment_TargetList(pid,EID)
     sorted_target = sort_project_target(project_target)
     default_schedule, default_schedule_chart = get_observable_time(uhaveid, pid, sorted_target)
 
