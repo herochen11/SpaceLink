@@ -46,7 +46,9 @@ class Target(GraphObject):
     __primarylabel__ ="target"
     __primarykey__ ="TID"
     TID = Property()
-    Name = Property()
+    name = Property()
+    longitude = Property()
+    latitude = Property()
 
 class Project(GraphObject):
     __primarylabel__ = "project"

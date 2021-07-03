@@ -462,13 +462,16 @@ def target_post():
 def target_search_get():
     return render_template("projects/search_target.html")
 
+# 0703 change the function to query_from_simbad
 @app.route('/projects/search', methods=['POST'])
 def target_search_post():
     text = request.form.get('search').strip()
-    text = '(?i).*'+text+'.*'
+    # text = '(?i).*'+text+'.*'
     print(text)
-    #if request.form.get('button') == 'Search':
-    target = search_target(text)
+    # if request.form.get('button') == 'Search':
+    # target = search_target(text)
+    target = query_from_simbad(text)
+
     #return render_template("projects/search_target.html", target = target)
     return jsonify(target = target)
 

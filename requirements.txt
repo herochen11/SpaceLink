@@ -7,3 +7,5 @@ astroplan
 flask-paginate
 ephem
 psycopg2
+pymongo
+astroquery
