@@ -145,7 +145,7 @@ def get_user_equipments(usr: str):
         "h.latitude as latitude, h.altitude as altitude, h.time_zone as time_zone, h.daylight_saving as daylight_saving, h.water_vapor as water_vapor, h.light_pollution as light_pollution," \
         "e.aperture as aperture, e.Fov as Fov, e.pixel_scale as pixel_scale, e.tracking_accuracy as accuracy, e.lim_magnitude as lim_magnitude, e.elevation_lim as elevation_lim," \
         "e.mount_type as mount_type, e.camera_type1 as camera_type1, e.camera_type2 as camera_type2, e.JohnsonB as JohnsonB, e.JohnsonR as JohnsonR, e.JohnsonV as JohnsonV, e.SDSSu as SDSSu," \
-        "e.SDSSg as SDSSg, e.SDSSr as SDSSr, e.SDSSi as SDSSi,e.SDSSz as SDSSz, h.uhaveid as id" ,usr=usr).data()
+        "e.SDSSg as SDSSg, e.SDSSr as SDSSr, e.SDSSi as SDSSi,e.SDSSz as SDSSz, e.project_priority as priority , h.uhaveid as id" ,usr=usr).data()
     return user_equipments
 
 #this function calculate the declination limit of the equipment and update the table
@@ -213,6 +213,7 @@ def create_equipments(aperture:float,Fov:float,pixel_scale:float,tracking_accura
     equipment.SDSSr = SDSSr
     equipment.SDSSi = SDSSi
     equipment.SDSSz = SDSSz
+    equipment.project_priority = None
     graph.create(equipment)
     
     return equipment
@@ -238,3 +239,13 @@ def get_eid(uhaveid):
     eid = int(eid[0]['EID'])
 
     return eid
+
+
+def update_equipment_project_priority(usr: str, eid : int, new_priority: list):
+    query = "MATCH (x:user{usr:$usr})-[h:UhaveE]->(e:equipments{eid:$eid}) set e.equipment_priority = $new_priority"
+    result = graph.run(query,usr = usr,eid = eid, new_priority = new_priority)
+
+def get_equipment_project_priority(usr:str,eid : int):
+    query = "MATCH (x:user{usr:$usr})-[h:UhaveE]->(e:equipments{eid:$eid}) return e.equipment_priority as priority"
+    result = graph.run(query,usr = usr,eid = eid).data()
+    return result[0]['priority']

@@ -3,6 +3,7 @@ from typing import Optional
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 from services.classes import User, Target, Equipments, Project, Schedule
 from datetime import datetime, timedelta
+from services.accounts_service import get_equipment_project_priority, update_equipment_project_priority
 
 import astro.declination_limit_of_location as declination
 import astro.astroplan_calculations as schedule
@@ -341,7 +342,18 @@ def auto_join(usr: str, PID: int):
         else:
             cnt = count[0]['rel.phaveeid']+1
         target_list = initial_equipment_target_list(usr,qualified_eid_list[i]['EID'],PID)
-        graph.run(query, PID=PID, EID=qualified_eid_list[i]['EID'], phaveeid=cnt,declination = qualified_eid_list[i]['declination'], target_list = targer_list )
+        graph.run(query, PID=PID, EID=qualified_eid_list[i]['EID'], phaveeid=cnt,declination = qualified_eid_list[i]['declination'], target_list = target_list )
+        
+        #add the project to the last in the prioritty list
+        old_priority = get_equipment_project_priority(usr,int(qualified_eid_list[i]['EID']))
+        if(old_priority == None):
+            list = []
+            list.append(PID)
+            update_equipment_project_priority(usr,int(qualified_eid_list[i]['EID']))
+        else:
+            old_priority.append(PID)
+            update_equipment_project_priority(usr,int(qualified_eid_list[i]['EID']))
+
 
 #this function is uesd to test, the user will auto leave the project
 def auto_leave(usr: str, PID: int):
